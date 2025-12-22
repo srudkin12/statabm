@@ -3,5 +3,5 @@ d TDABM: Ball Mapper for Topological Data Analysis
 d
 d Distribution-Date: 20251222
 d
-f ballmapper.ado
-f ballmapper.sthlp
+f TDABM.ado
+f TDABM.sthlp
