@@ -1,0 +1,4 @@
+v 3
+d TDABM: Ball Mapper for Topological Data Analysis
+d Author: Simon Rudkin, Wanling Rudkin
+p TDABM
