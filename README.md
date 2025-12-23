@@ -1,5 +1,7 @@
 BallMapper for Stata (v29.1)
 
+(This code was written with heavy support from Gemini 3 - Documentation will be created in due course)
+
 A Stata implementation of the Ball Mapper algorithm for Topological Data Analysis (TDA). This command allows you to visualize the "shape" of high-dimensional data by creating a network of overlapping landmarks. Unlike dimensionality reduction techniques (like PCA or t-SNE), Ball Mapper preserves the original distances of your data, ensuring no information loss during the landmark discovery phase.
 
 Features
