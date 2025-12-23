@@ -49,5 +49,15 @@ The command creates a new frame called BM_LONG_DATA. This is a long-form mapping
 orig_obs_id: The observation ID from your original dataset.
 bm_node_id: The ID of the ball(s) that observation belongs to.This allows you to "zoom in" on specific nodes to see exactly which observations are driving the shape of the graph.
 
-Author Simon Rudkin, Wanling Rudkin
-License MIT License
+## Citation
+
+If you use this package in your research, please cite it as follows:
+
+**Software:**
+Rudkin, S. (2025). ballmapper: Topological Data Analysis for Stata. 
+Available at: https://github.com/srudkin12/statabm
+
+**Methodology:**
+The Ball Mapper algorithm was originally developed by:
+Dlotko, P. (2019). Ball Mapper: A Shape-Based Data Analysis Tool. 
+*SoftwareX*, 10, 100253. https://doi.org/10.1016/j.softx.2019.100253
