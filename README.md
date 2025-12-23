@@ -51,13 +51,12 @@ bm_node_id: The ID of the ball(s) that observation belongs to.This allows you to
 
 ## Citation
 
-If you use this package in your research, please cite it as follows:
+If you use this package in your research, please cite both the software and the original algorithm:
 
 **Software:**
-Rudkin, S. (2025). ballmapper: Topological Data Analysis for Stata. 
-Available at: https://github.com/srudkin12/statabm
+Rudkin, S. and Rudkin, W. (2025). ballmapper: Topological Data Analysis for Stata. 
+[https://github.com/srudkin12/statabm](https://github.com/srudkin12/statabm)
 
 **Methodology:**
-The Ball Mapper algorithm was originally developed by:
-Dlotko, P. (2019). Ball Mapper: A Shape-Based Data Analysis Tool. 
-*SoftwareX*, 10, 100253. https://doi.org/10.1016/j.softx.2019.100253
+Dłotko, P. (2019). Ball mapper: A shape summary for topological data analysis. 
+*arXiv preprint arXiv:1901.07410*.
