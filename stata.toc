@@ -2,3 +2,4 @@ v 3
 d ballmapper: Ball Mapper for Topological Data Analysis
 d Author: Simon Rudkin, Wanling Rudkin
 p ballmapper
+p ballsummary
