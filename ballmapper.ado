@@ -99,11 +99,11 @@ program ballmapper
     syntax varlist, Epsilon(real) [Color(varname) Scale(real 1.0) Labels Filename(string) ///
             Layout Repulsion(real 0.05) Attraction(real 0.1)]
     
-    * Pre-emptive Frame Cleanup
+    cap frame change default
     foreach f in BM_RESULTS BM_MERGED BM_SANDBOX {
         cap frame drop `f'
     }
-
+    
     scalar BM_EPS = `epsilon'
     local layout_opt = ("`layout'" != "")
     local color_name = "`color'"
