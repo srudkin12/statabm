@@ -73,7 +73,16 @@ which landmark ball(s) each observation belongs to.
 {pstd}Applying a force-directed layout for abstract visualization:{p_end}
 {phang2}{cmd:. ballmapper x1 x2 x3 x4, epsilon(5.0) layout labels}{p_end}
 
+{marker ballsummary}{...}
+{title:ballsummary}
 
+{pstd}
+{bf:ballsummary} [{varlist}] 
+
+{pstd}
+Calculates the mean values of the specified variables for each landmark ball. 
+Results are stored in the {bf:BM_SUMMARY} frame. This command must be run 
+after {bf:ballmapper}.
 
 
 {marker citation}{...}
