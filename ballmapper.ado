@@ -104,10 +104,10 @@ program ballmapper
     local layout_opt = ("`layout'" != "")
     local color_name = "`color'"
     if "`color_name'" == "" local color_name "Value"
-
-    * --- NEW: Setup frames to survive the command ---
-    cap frame drop BM_RESULTS  // This will store the Graph Nodes/Edges
-    cap frame drop BM_MERGED   // This will store Original Data + Ball IDs
+ 
+	foreach f in BM_RESULTS BM_MERGED BM_SANDBOX {
+        cap frame drop `f'
+    }
     
     qui {
         tempvar touse
@@ -130,6 +130,7 @@ program ballmapper
         save "`user_data_temp'"
     }
     cap frame drop BM_SANDBOX
+     
     frame create BM_SANDBOX
     frame BM_SANDBOX {
         mata: build_bm(BM_X_DATA, BM_C_DATA, `layout_opt', `repulsion', `attraction')
@@ -188,6 +189,7 @@ program ballmapper
             graph export "`filename'", replace
         }
     }
+	cap frame drop BM_MERGED 
 	frame create BM_MERGED
     frame BM_MERGED {
         * Get the membership matrix from Mata (Col 1: Point ID, Col 2: Ball ID)
@@ -197,6 +199,7 @@ program ballmapper
         merge m:1 orig_obs_id using "`user_data_temp'", nogenerate
         label var ball_id "Ball Mapper Landmark ID"
     }
+	cap frame drop BM_RESULTS
 	frame copy BM_SANDBOX BM_RESULTS
     frame drop BM_SANDBOX
 
