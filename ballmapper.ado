@@ -129,7 +129,7 @@ program ballmapper
         tempfile user_data_temp
         save "`user_data_temp'"
     }
-   
+    cap frame drop BM_SANDBOX
     frame create BM_SANDBOX
     frame BM_SANDBOX {
         mata: build_bm(BM_X_DATA, BM_C_DATA, `layout_opt', `repulsion', `attraction')
