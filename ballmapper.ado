@@ -1,7 +1,6 @@
 *! Ball Mapper v29.1 - RESET VERSION
 cap mata: mata drop build_bm()
 cap program drop ballmapper
-* This "end" is here to catch any stray Mata blocks currently open in your Stata session
 cap end 
 
 mata:
@@ -100,21 +99,21 @@ program ballmapper
     syntax varlist, Epsilon(real) [Color(varname) Scale(real 1.0) Labels Filename(string) ///
             Layout Repulsion(real 0.05) Attraction(real 0.1)]
     
+    * Pre-emptive Frame Cleanup
+    foreach f in BM_RESULTS BM_MERGED BM_SANDBOX {
+        cap frame drop `f'
+    }
+
     scalar BM_EPS = `epsilon'
     local layout_opt = ("`layout'" != "")
     local color_name = "`color'"
     if "`color_name'" == "" local color_name "Value"
- 
-	foreach f in BM_RESULTS BM_MERGED BM_SANDBOX {
-        cap frame drop `f'
-    }
-    
+
     qui {
         tempvar touse
         mark `touse'
         markout `touse' `varlist' `color'
         
-        * Capture original data for merging later
         preserve
         keep if `touse'
         gen double orig_obs_id = _n 
@@ -129,8 +128,9 @@ program ballmapper
         tempfile user_data_temp
         save "`user_data_temp'"
     }
+
+    * Sandbox Creation
     cap frame drop BM_SANDBOX
-     
     frame create BM_SANDBOX
     frame BM_SANDBOX {
         mata: build_bm(BM_X_DATA, BM_C_DATA, `layout_opt', `repulsion', `attraction')
@@ -181,31 +181,30 @@ program ballmapper
                       cols(1) pos(3) size(vsmall) region(lcolor(white%0)) subtitle("`color_name'", size(vsmall))) ///
                xlabel(none) ylabel(none) xscale(off) yscale(off) ///
                graphregion(color(white)) name(BM_Plot, replace)
-		if "`filename'" != "" {
-            * Check if user provided an extension; default to .png if not
-            if strpos("`filename'", ".") == 0 {
-                local filename "`filename'.png"
-            }
+
+        if "`filename'" != "" {
+            if strpos("`filename'", ".") == 0 local filename "`filename'.png"
             graph export "`filename'", replace
         }
     }
-	cap frame drop BM_MERGED 
-	frame create BM_MERGED
+
+    * Merged Data Creation
+    cap frame drop BM_MERGED 
+    frame create BM_MERGED
     frame BM_MERGED {
-        * Get the membership matrix from Mata (Col 1: Point ID, Col 2: Ball ID)
         getmata (orig_obs_id ball_id) = BM_MEMBERSHIP_MAT
-        
-        * Merge back the original variables (x1, x2, y1, y2...)
         merge m:1 orig_obs_id using "`user_data_temp'", nogenerate
         label var ball_id "Ball Mapper Landmark ID"
     }
-	cap frame drop BM_RESULTS
-	frame copy BM_SANDBOX BM_RESULTS
-    frame drop BM_SANDBOX
 
-    restore // Returns your 'default' frame to original state
+    * Results Extraction
+    cap frame drop BM_RESULTS
+    frame copy BM_SANDBOX BM_RESULTS
+    cap frame drop BM_SANDBOX
+
+    restore 
     
     di as txt _n "Ball Mapper Successful."
-    di as txt " -> Graph data stored in frame: " as res "BM_RESULTS"
-    di as txt " -> Original data + Ball IDs in frame: " as res "BM_MERGED"
+    di as txt " -> Graph data stored in frame: BM_RESULTS"
+    di as txt " -> Original data + Ball IDs in frame: BM_MERGED"
 end
