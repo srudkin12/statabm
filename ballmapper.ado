@@ -98,35 +98,38 @@ end
 program ballmapper
     version 16.0
     syntax varlist, Epsilon(real) [Color(varname) Scale(real 1.0) Labels Filename(string) ///
-           Layout Repulsion(real 0.05) Attraction(real 0.1)]
+            Layout Repulsion(real 0.05) Attraction(real 0.1)]
     
     scalar BM_EPS = `epsilon'
     local layout_opt = ("`layout'" != "")
     local color_name = "`color'"
     if "`color_name'" == "" local color_name "Value"
 
-    cap frame change default
-    foreach f in BM_LONG_DATA BM_SANDBOX {
-        cap frame drop `f' 
-    }
-
+    * --- NEW: Setup frames to survive the command ---
+    cap frame drop BM_RESULTS  // This will store the Graph Nodes/Edges
+    cap frame drop BM_MERGED   // This will store Original Data + Ball IDs
+    
     qui {
         tempvar touse
         mark `touse'
         markout `touse' `varlist' `color'
+        
+        * Capture original data for merging later
         preserve
         keep if `touse'
+        gen double orig_obs_id = _n 
+        
         tempvar color_data
         if "`color'" != "" gen double `color_data' = `color'
         else gen double `color_data' = 0
+        
         mata: BM_X_DATA = st_data(., "`varlist'")
         mata: BM_C_DATA = st_data(., "`color_data'")
-        cap drop orig_obs_id
-        gen double orig_obs_id = _n
-        tempfile user_data_file
-        save "`user_data_file'"
+        
+        tempfile user_data_temp
+        save "`user_data_temp'"
     }
-
+   
     frame create BM_SANDBOX
     frame BM_SANDBOX {
         mata: build_bm(BM_X_DATA, BM_C_DATA, `layout_opt', `repulsion', `attraction')
@@ -178,6 +181,21 @@ program ballmapper
                xlabel(none) ylabel(none) xscale(off) yscale(off) ///
                graphregion(color(white)) name(BM_Plot, replace)
     }
-    restore
-    di as txt _n "Ball Mapper Successful. Landmarks: " as res scalar(n_land_found)
+	frame create BM_MERGED
+    frame BM_MERGED {
+        * Get the membership matrix from Mata (Col 1: Point ID, Col 2: Ball ID)
+        getmata (orig_obs_id ball_id) = BM_MEMBERSHIP_MAT
+        
+        * Merge back the original variables (x1, x2, y1, y2...)
+        merge m:1 orig_obs_id using "`user_data_temp'", nogenerate
+        label var ball_id "Ball Mapper Landmark ID"
+    }
+	frame copy BM_SANDBOX BM_RESULTS
+    frame drop BM_SANDBOX
+
+    restore // Returns your 'default' frame to original state
+    
+    di as txt _n "Ball Mapper Successful."
+    di as txt " -> Graph data stored in frame: " as res "BM_RESULTS"
+    di as txt " -> Original data + Ball IDs in frame: " as res "BM_MERGED"
 end

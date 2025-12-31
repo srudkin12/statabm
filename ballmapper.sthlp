@@ -47,6 +47,12 @@ point cloud with a set of overlapping balls (landmarks) of radius {cmd:epsilon}.
 Two balls are connected by an edge if they share at least one common observation from the original data. 
 This creates a "skeleton" of the data manifold without the information loss typical of linear projections like PCA.
 
+Stored results
+    The command stores the following data in new Frames:
+    
+    BM_RESULTS   Contains the graph structure (nodes and edges) used for plotting.
+    BM_MERGED    Contains your original dataset merged with a new column 'ball_id'.
+                 Use 'frame change BM_MERGED' to access this data.
 
 {marker options}{...}
 {title:Options}

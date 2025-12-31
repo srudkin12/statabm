@@ -1,7 +1,6 @@
 v 3
-d ballmapper: Ball Mapper for Topological Data Analysis
-d
-d Distribution-Date: 20251222
-d
+d ballmapper. Ball Mapper for Stata.
+d Creates topological summaries of data.
+d Distribution-Date: 20251231  
 f ballmapper.ado
 f ballmapper.sthlp
