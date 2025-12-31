@@ -1,3 +1,4 @@
+*! ballsummary v1.0.1 31dec2025
 program ballsummary
     version 16.0
     syntax [varlist], [Clear]
@@ -9,40 +10,45 @@ program ballsummary
         exit 111
     }
 
-    * 2. If no varlist is provided, use all numeric variables from the original data
+    * 2. Identify variables to summarize
+    * If no varlist is provided, get all numeric variables except IDs
     if "`varlist'" == "" {
         ds ball_id orig_obs_id, not
         local varlist `r(varlist)'
     }
 
-    di as txt "Generating summary statistics for `r(N)' observations across landmarks..."
+    di as txt "Calculating landmark summaries for: " as res "`varlist'"
 
-    * 3. Create the summary frame
+    * 3. Prepare the Summary Frame
     cap frame drop BM_SUMMARY
-    frame create BM_SUMMARY
     
-    * 4. Perform the calculation
-    * We calculate Mean, SD, and Count for every variable in the varlist
-    frame BM_MERGED: statsby `varlist' n=(_b[ball_id]), by(ball_id) saving("`temp_stats'", replace): summarize
-    
-    * Alternatively, a faster approach using collapse:
+    * 4. Use a temporary frame to perform the aggregation
+    cap frame drop BM_TEMP_SUM
     frame copy BM_MERGED BM_TEMP_SUM
+    
     frame BM_TEMP_SUM {
-        collapse (mean) `varlist' (count) point_count=orig_obs_id, by(ball_id)
-        label var point_count "Number of points in ball"
-        tempfile sum_data
-        save "`sum_data'"
+        * Aggregate: Mean of vars, and count of points
+        collapse (mean) `varlist' (count) ball_density=orig_obs_id, by(ball_id)
+        
+        label var ball_id "Landmark ID"
+        label var ball_density "Points inside Ball"
+        
+        tempfile sum_results
+        save "`sum_results'"
     }
     cap frame drop BM_TEMP_SUM
 
-    * 5. Load results into the Summary Frame
+    * 5. Load results into BM_SUMMARY
+    frame create BM_SUMMARY
     frame BM_SUMMARY {
-        use "`sum_data'", clear
+        use "`sum_results'", clear
         sort ball_id
-        di as res _n "Summary table created in frame: BM_SUMMARY"
-        list in 1/10
+        di as txt "Summary table created in frame: " as res "BM_SUMMARY"
+        
+        * Provide a clean preview to the user
+        list ball_id ball_density `varlist' in 1/10, separator(0) divider
     }
 
-    * 6. Return to default frame
-    frame change default
+    * 6. Return to the default frame so the user isn't 'lost'
+    cap frame change default
 end
