@@ -180,6 +180,13 @@ program ballmapper
                       cols(1) pos(3) size(vsmall) region(lcolor(white%0)) subtitle("`color_name'", size(vsmall))) ///
                xlabel(none) ylabel(none) xscale(off) yscale(off) ///
                graphregion(color(white)) name(BM_Plot, replace)
+		if "`filename'" != "" {
+            * Check if user provided an extension; default to .png if not
+            if strpos("`filename'", ".") == 0 {
+                local filename "`filename'.png"
+            }
+            graph export "`filename'", replace
+        }
     }
 	frame create BM_MERGED
     frame BM_MERGED {
