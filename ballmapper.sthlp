@@ -84,6 +84,81 @@ Calculates the mean values of the specified variables for each landmark ball.
 Results are stored in the {bf:BM_SUMMARY} frame. This command must be run 
 after {bf:ballmapper}.
 
+{smcl}
+{* *! version 29.2  31dec2025}{...}
+{title:Title}
+
+{phang}
+{bf:ballmapper} {hline 2} Ball Mapper algorithm for Topological Data Analysis (TDA)
+
+{marker syntax}{...}
+{title:Syntax}
+
+{p 8 17 2}
+{bf:ballmapper} {varlist} {ifin} {cmd:,} {opt e:psilon(#)} [{it:mapper_options}]
+
+{p 8 17 2}
+{bf:ballsummary} [{varlist}]
+
+{p 8 17 2}
+{bf:variablesummary} {varname} [{cmd:,} {it:summary_options}]
+
+{marker options_summary}{...}
+{title:Options for variablesummary}
+
+{synoptset 25 tabbed}{...}
+{synopthdr:summary_options}
+{synoptline}
+{synopt:{opt b:all(numlist)}}restrict analysis to specific landmark IDs{p_end}
+{synopt:{opt boxplot}}generate a box plot of the variable across all landmarks{p_end}
+{synopt:{opt boxfile(string)}}save the box plot to a file (default extension .png){p_end}
+{synopt:{opt csvfile(string)}}export the summary statistics table to a .csv file{p_end}
+{synoptline}
+
+{marker description}{...}
+{title:Description}
+
+{pstd}
+The {bf:ballmapper} suite provides tools for Topological Data Analysis. 
+
+{pstd}
+{bf:ballmapper} creates the abstract graph representation. It stores the graph structure in 
+the frame {bf:BM_RESULTS} and the point-to-ball assignments in {bf:BM_MERGED}.
+
+{pstd}
+{bf:ballsummary} produces a table of mean values for each landmark, stored in {bf:BM_SUMMARY}. 
+
+{pstd}
+{bf:variablesummary} provides a deep-dive into a single variable's distribution within each ball, 
+useful for detecting "bridge" nodes (landmarks with high variance) vs "pure" nodes.
+
+
+{marker examples}{...}
+{title:Examples}
+
+{pstd}1. Generate the topological skeleton:{p_end}
+{phang2}{cmd:. ballmapper x1 x2, epsilon(2.5) color(y1)}{p_end}
+
+{pstd}2. Get a quick overview of all y variables per landmark:{p_end}
+{phang2}{cmd:. ballsummary y1 y2 y3 y4 y5}{p_end}
+
+{pstd}3. Detail the distribution of cluster assignments (y2) to identify overlaps:{p_end}
+{phang2}{cmd:. variablesummary y2, boxplot boxfile("cluster_overlap") csvfile("stats_table")}{p_end}
+
+{marker ballsummary}{...}
+{title:ballsummary}
+
+{p 8 17 2}
+{bf:ballsummary} [{varlist}] [{cmd:,} {opt csvfile(string)}]
+
+{pstd}
+Calculates the mean values of variables for each landmark. 
+
+{synoptset 20 tabbed}{...}
+{synopthdr}
+{synoptline}
+{synopt:{opt csvfile(string)}}save the summary table as a .csv file{p_end}
+{synoptline}
 
 {marker citation}{...}
 {title:Citation}

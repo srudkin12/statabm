@@ -1,7 +1,8 @@
-*! ballsummary v1.0.1 31dec2025
+*! ballsummary v1.1.0 31dec2025
 program ballsummary
     version 16.0
-    syntax [varlist], [Clear]
+    * Added CSVfile option to syntax
+    syntax [varlist], [CSVfile(string)]
 
     * 1. Check if the required frame exists
     cap frame change BM_MERGED
@@ -11,7 +12,6 @@ program ballsummary
     }
 
     * 2. Identify variables to summarize
-    * If no varlist is provided, get all numeric variables except IDs
     if "`varlist'" == "" {
         ds ball_id orig_obs_id, not
         local varlist `r(varlist)'
@@ -27,7 +27,6 @@ program ballsummary
     frame copy BM_MERGED BM_TEMP_SUM
     
     frame BM_TEMP_SUM {
-        * Aggregate: Mean of vars, and count of points
         collapse (mean) `varlist' (count) ball_density=orig_obs_id, by(ball_id)
         
         label var ball_id "Landmark ID"
@@ -43,12 +42,21 @@ program ballsummary
     frame BM_SUMMARY {
         use "`sum_results'", clear
         sort ball_id
-        di as txt "Summary table created in frame: " as res "BM_SUMMARY"
         
-        * Provide a clean preview to the user
+        * --- NEW: Export to CSV logic ---
+        if "`csvfile'" != "" {
+            * Ensure file extension is .csv
+            if strpos("`csvfile'", ".") == 0 {
+                local csvfile "`csvfile'.csv"
+            }
+            export delimited using "`csvfile'", replace
+            di as txt "Summary statistics exported to: " as res "`csvfile'"
+        }
+
+        di as txt "Summary table created in frame: " as res "BM_SUMMARY"
         list ball_id ball_density `varlist' in 1/10, separator(0) divider
     }
 
-    * 6. Return to the default frame so the user isn't 'lost'
+    * 6. Return to the default frame
     cap frame change default
 end
