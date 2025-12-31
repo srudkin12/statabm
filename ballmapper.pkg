@@ -3,4 +3,5 @@ d ballmapper. Ball Mapper for Stata.
 d Creates topological summaries of data.
 d Distribution-Date: 20251231  
 f ballmapper.ado
+f ballsummary.ado
 f ballmapper.sthlp
