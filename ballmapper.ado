@@ -1,4 +1,4 @@
-*! Ball Mapper v29.1 - RESET VERSION
+*! Ball Mapper v29.2 - FIXED QUANTILE CRASH
 cap mata: mata drop build_bm()
 cap program drop ballmapper
 cap end 
@@ -145,15 +145,36 @@ program ballmapper
                 local v`stat' = cond(r(`stat')==., 0, r(`stat'))
             }
             
+            * --- FIX: Check node count before binning ---
+            count if type == "node"
+            local n_nodes = r(N)
+            * Use 20 or the number of nodes, whichever is smaller (min 1)
+            local target_bins = max(1, min(20, `n_nodes'))
+            
             cap drop bin
-            xtile bin = mean_color if type == "node", n(20)
+            if `n_nodes' > 0 {
+                xtile bin = mean_color if type == "node", n(`target_bins')
+            }
+            else {
+                gen bin = .
+            }
+            
             sum bin, meanonly
             local max_bin = cond(r(max)==., 1, r(max))
         }
         
-        forv b = 1/20 {
-            qui mata: st_local("hex_`b'", sprintf("%g %g %g", round(255*(`b'/20)), 80, round(255*(1 - `b'/20))))
+        * Loop uses max_bin instead of hardcoded 20
+        forv b = 1/`max_bin' {
+            qui mata: st_local("hex_`b'", sprintf("%g %g %g", round(255*(`b'/`max_bin')), 80, round(255*(1 - `b'/`max_bin'))))
         }
+
+        * --- FIX: Dynamic Legend Keys ---
+        * We find 5 evenly spaced indices between 1 and max_bin
+        local l1 = 1
+        local l2 = max(1, floor(`max_bin' * 0.25))
+        local l3 = max(1, floor(`max_bin' * 0.50))
+        local l4 = max(1, floor(`max_bin' * 0.75))
+        local l5 = `max_bin'
 
         local node_layers ""
         forv i = 1/`max_bin' {
@@ -166,12 +187,13 @@ program ballmapper
         local label_cmd ""
         if "`labels'" != "" local label_cmd (scatter y x if type == "node", mlabel(node_id) mlabpos(0) mlabsize(tiny) mlabcolor(white) msize(0))
 
+        * Graph command using dynamic legend colors (l1...l5)
         twoway (pcspike y1 x1 y2 x2 if type == "edge", lcolor(black%25) lwidth(vthin)) ///
-               (scatter y x if _n==0, mcolor("`hex_1'") msize(3) msymbol(circle)) ///
-               (scatter y x if _n==0, mcolor("`hex_5'") msize(3) msymbol(circle)) ///
-               (scatter y x if _n==0, mcolor("`hex_10'") msize(3) msymbol(circle)) ///
-               (scatter y x if _n==0, mcolor("`hex_15'") msize(3) msymbol(circle)) ///
-               (scatter y x if _n==0, mcolor("`hex_20'") msize(3) msymbol(circle)) ///
+               (scatter y x if _n==0, mcolor("`hex_`l1''") msize(3) msymbol(circle)) ///
+               (scatter y x if _n==0, mcolor("`hex_`l2''") msize(3) msymbol(circle)) ///
+               (scatter y x if _n==0, mcolor("`hex_`l3''") msize(3) msymbol(circle)) ///
+               (scatter y x if _n==0, mcolor("`hex_`l4''") msize(3) msymbol(circle)) ///
+               (scatter y x if _n==0, mcolor("`hex_`l5''") msize(3) msymbol(circle)) ///
                `node_layers' `label_cmd', ///
                aspect(1) title("Epsilon: `epsilon'") ///
                legend(order(2 3 4 5 6) ///
@@ -208,5 +230,3 @@ program ballmapper
     di as txt " -> Graph data stored in frame: BM_RESULTS"
     di as txt " -> Original data + Ball IDs in frame: BM_MERGED"
 end
-
-
