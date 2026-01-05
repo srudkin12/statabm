@@ -8,7 +8,7 @@ net install ballmapper, from("https://raw.githubusercontent.com/srudkin12/statab
 
 Documentation:
 
-The file tdabmstata.pdf contains a guide to the ballmapper package in Stata. The accompanying do files are, statabi1.do for the X data example, autodata.do for the auto data example, and appendix.do for Appendix B. Users are encouraged to use the accompanying guide to follow the .do files. 
+The paper [https://arxiv.org/abs/2601.00508](https://arxiv.org/abs/2601.00508) contains a guide to the ballmapper package in Stata. The accompanying do files are, statabi1.do for the X data example, autodata.do for the auto data example, and appendix.do for Appendix B. Users are encouraged to use the accompanying guide to follow the .do files. 
 
 ## Citation
 
@@ -21,3 +21,14 @@ Rudkin, S. and Rudkin, W. (2025). ballmapper: Topological Data Analysis for Stat
 **Methodology:**
 Dłotko, P. (2019). Ball mapper: A shape summary for topological data analysis. 
 *arXiv preprint arXiv:1901.07410*.
+
+**Bibtex**
+@misc{rudkin2026ballmapperapplyingtopologicaldata,
+      title={ballmapper: Applying Topological Data Analysis Ball Mapper in Stata}, 
+      author={Simon Rudkin and Wanling Rudkin},
+      year={2026},
+      eprint={2601.00508},
+      archivePrefix={arXiv},
+      primaryClass={stat.ME},
+      url={https://arxiv.org/abs/2601.00508}, 
+}
