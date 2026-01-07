@@ -3,7 +3,7 @@ program variablesummary
     version 16.0
     syntax varname, [Ball(numlist) Boxplot Boxfile(string) CSVfile(string)]
 
-    * 1. Check if the required frame exists
+    * Check if the required frame exists
     cap frame change BM_MERGED
     if _rc {
         di as error "Error: Frame BM_MERGED not found. Please run 'ballmapper' first."
@@ -13,7 +13,7 @@ program variablesummary
     local v `varlist'
     di as txt _n "Analyzing distribution of: " as res "`v'"
 
-    * 2. Prepare Detailed Statistics Frame
+    * Past examples of frames are dropped to avoid issues in the calcuations. A new temporary frame is created that directly copes BM_MERGED
     cap frame drop BM_VAR_SUMMARY
     cap frame drop BM_TEMP_VAR
     frame copy BM_MERGED BM_TEMP_VAR
@@ -35,14 +35,13 @@ program variablesummary
     }
     cap frame drop BM_TEMP_VAR
 
-    * 3. Process BM_VAR_SUMMARY Frame
+    * The BM_SUMMARY frame is created to store the results
     frame create BM_VAR_SUMMARY
     frame BM_VAR_SUMMARY {
         use "`var_sum_results'", clear
         if "`ball'" != "" keep if inlist(ball_id, `ball')
         sort ball_id
         
-        * --- CSV Export Logic ---
         if "`csvfile'" != "" {
             if strpos("`csvfile'", ".") == 0 local csvfile "`csvfile'.csv"
             export delimited using "`csvfile'", replace
@@ -54,15 +53,14 @@ program variablesummary
         list ball_id n mean sd min p25 med p75 max, separator(0) divider
     }
 
-    * 4. --- Boxplot Logic ---
+    * The variablesummary command also includes the option to obtain boxplots of values in each ball. We create the boxplot from the MERGED frame to get full point distribution.
     if "`boxplot'" != "" {
-        * We create the boxplot from the MERGED frame to get full point distribution
+
         frame BM_MERGED: graph box `v', over(ball_id, label(labsize(vsmall))) ///
             title("Distribution of `v' by Landmark") ///
             subtitle("Variable Summary Analysis") ///
             ytitle("Value") marker(1, msize(tiny) mcolor(gs10)) ///
-            graphregion(color(white)) name(BM_Boxplot, replace)
-            
+            graphregion(color(white)) name(BM_Boxplot, replace          
         if "`boxfile'" != "" {
             if strpos("`boxfile'", ".") == 0 local boxfile "`boxfile'.png"
             graph export "`boxfile'", replace

@@ -1,4 +1,3 @@
-*! Ball Mapper v29.2 - FIXED QUANTILE CRASH
 cap mata: mata drop build_bm()
 cap program drop ballmapper
 cap end 
@@ -129,7 +128,7 @@ program ballmapper
         save "`user_data_temp'"
     }
 
-    * Sandbox Creation
+    * Because the code will need to create objects during the operation, a SANDBOX frame is used.
     cap frame drop BM_SANDBOX
     frame create BM_SANDBOX
     frame BM_SANDBOX {
@@ -145,10 +144,9 @@ program ballmapper
                 local v`stat' = cond(r(`stat')==., 0, r(`stat'))
             }
             
-            * --- FIX: Check node count before binning ---
+            * Coloration in Stata is based upon bins. To give a reasonable set of values 20 bins are used. However, if the number of balls is lower than 20 then the number of balls is used
             count if type == "node"
             local n_nodes = r(N)
-            * Use 20 or the number of nodes, whichever is smaller (min 1)
             local target_bins = max(1, min(20, `n_nodes'))
             
             cap drop bin
@@ -168,8 +166,7 @@ program ballmapper
             qui mata: st_local("hex_`b'", sprintf("%g %g %g", round(255*(`b'/`max_bin')), 80, round(255*(1 - `b'/`max_bin'))))
         }
 
-        * --- FIX: Dynamic Legend Keys ---
-        * We find 5 evenly spaced indices between 1 and max_bin
+        * We find 5 evenly spaced indices between 1 and max_bin to use in the legend. Note that Stata does not produce color bars like the Python and R packages.
         local l1 = 1
         local l2 = max(1, floor(`max_bin' * 0.25))
         local l3 = max(1, floor(`max_bin' * 0.50))
